@@ -3,9 +3,9 @@ require 'omniauth-oauth2'
 module OmniAuth
   module Strategies
     class Instagram < OmniAuth::Strategies::OAuth2
-      option :client_options,         site: 'https://api.instagram.com',
-                                      authorize_url: 'https://api.instagram.com/oauth/authorize',
-                                      token_url: 'https://api.instagram.com/oauth/access_token'
+      option :client_options, site: 'https://graph.instagram.com',
+                              authorize_url: 'https://api.instagram.com/oauth/authorize',
+                              token_url: 'https://api.instagram.com/oauth/access_token'
 
       def callback_url
         full_host + script_name + callback_path
@@ -23,12 +23,9 @@ module OmniAuth
 
       info do
         {
-          'nickname' => raw_info['username'],
-          'name'     => raw_info['full_name'],
-          'image'    => raw_info['profile_picture'],
-          'bio'      => raw_info['bio'],
-          'website'  => raw_info['website'],
-          'is_business' => raw_info['is_business']
+          'nickname'     => raw_info['username'],
+          'media_count'  => raw_info['media_count'],
+          'account_type' => raw_info['account_type']
         }
       end
 
@@ -39,17 +36,16 @@ module OmniAuth
       end
 
       def raw_info
-        if options[:extra_data]
-          endpoint = '/users/self'
-          params = {}
-          access_token.options[:mode] = :query
-          access_token.options[:param_name] = 'access_token'
-          params['sig'] = generate_sig(endpoint, 'access_token' => access_token.token) if options[:enforce_signed_requests]
-          @data ||= access_token.get("/v1#{endpoint}", params: params).parsed['data'] || {}
-        else
-          @data ||= access_token.params['user']
-        end
-        @data
+        @raw_info ||= if options[:extra_data]
+                        endpoint = '/me'
+                        params = { 'fields' => 'id,username,account_type,media_count' }
+                        access_token.options[:mode] = :query
+                        access_token.options[:param_name] = 'access_token'
+                        params['sig'] = generate_sig(endpoint, 'access_token' => access_token.token) if options[:enforce_signed_requests]
+                        access_token.get(endpoint, params: params).parsed || {}
+                      else
+                        { 'id' => access_token.params['user_id'] }
+                      end
       end
 
       # You can pass +scope+ params to the auth request, if you need to set them dynamically.

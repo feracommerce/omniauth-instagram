@@ -2,12 +2,12 @@
 
 This is the unofficial OmniAuth strategy for authenticating to Instagram. To
 use it, you'll need to sign up for an OAuth2 Application ID and Secret
-on the [Instagram Developer website](http://instagram.com/developer/).
+on the [Instagram Developer website](https://developers.facebook.com/docs/instagram-basic-display-api).
 
 ## Basic Usage
 
     use OmniAuth::Builder do
-      provider :instagram, ENV['INSTAGRAM_ID'], ENV['INSTAGRAM_SECRET'], scope: 'basic+media+public_content+follower_list+comments+relationships+likes'
+      provider :instagram, ENV['INSTAGRAM_ID'], ENV['INSTAGRAM_SECRET'], scope: 'user_profile+user_media'
     end
 
 ## Notes:

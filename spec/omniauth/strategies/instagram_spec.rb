@@ -7,7 +7,7 @@ describe OmniAuth::Strategies::Instagram do
     end
 
     it 'should have the correct site' do
-      expect(subject.options.client_options.site).to eq('https://api.instagram.com')
+      expect(subject.options.client_options.site).to eq('https://graph.instagram.com')
     end
 
     it 'should have the correct authorize url' do
